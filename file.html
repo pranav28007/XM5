@@ -1,0 +1,63 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+    <title>File Read and Write</title>
+</head>
+<body>
+
+<h2>Write to File</h2>
+<form method="post">
+    Enter Text: <input type="text" name="data" required>
+    <input type="submit" name="write" value="Write">
+</form>
+
+<h2>Read from File</h2>
+<form method="post">
+    <input type="submit" name="read" value="Read File">
+</form>
+
+<?php
+
+$filename = "sample.txt";
+
+// WRITE OPERATION
+if(isset($_POST['write'])) {
+    $data = $_POST['data'];
+
+    // open file in append mode
+    $file = fopen($filename, "a");
+
+    if($file) {
+        fwrite($file, $data . "\n");
+        fclose($file);
+        echo "<p style='color:green;'>Data written successfully!</p>";
+    } else {
+        echo "<p style='color:red;'>Error opening file!</p>";
+    }
+}
+
+// READ OPERATION
+if(isset($_POST['read'])) {
+    if(file_exists($filename)) {
+        $file = fopen($filename, "r");
+
+        echo "<h3>File Content:</h3>";
+
+        while(!feof($file)) {
+            echo fgets($file) . "<br>";
+        }
+
+        fclose($file);
+    } else {
+        echo "<p style='color:red;'>File does not exist!</p>";
+    }
+}
+
+?>
+
+</body>
+</html>
+40m
+
+Add an Emoji, Sticker, or GIF
