@@ -1,49 +1,43 @@
-ASSUME CS:CODE,DS:DATA
+ASSUME CS:CODE, DS:DATA, ES:DATA
 
 DATA SEGMENT
-SRC DB "OSALP LAB$"
-REV DB 10 DUP(?)
+    STR1 DB "oscaalp$"
+    COUNT EQU ($-STR1)
+
+    STR2 DB COUNT DUP(0)
 DATA ENDS
 
 CODE SEGMENT
 START:
-MOV AX,DATA
-MOV DS,AX
-MOV ES,AX
+    MOV AX, DATA
+    MOV DS, AX
+    MOV ES, AX
 
-; Point to source string
-LEA SI,SRC
+    MOV CX, COUNT-1        ; exclude '$'
 
-; Find end of string before $
+    LEA SI, STR1
+    LEA DI, STR2
+
+    ADD SI, COUNT-2        ; point to last character before '$'
+
+    STD                    ; backward direction for LODSB
+
 L1:
-MOV AL,[SI]
-CMP AL,'$'
-JE BACK
-INC SI
-JMP L1
+    LODSB                  ; AL = [SI], SI--
+    CLD                    ; forward direction for STOSB
+    STOSB                  ; [DI] = AL, DI++
+    STD                    ; again backward for next LODSB
+    LOOP L1
 
-BACK:
-DEC SI            ; Move to last character before $
+    CLD                    ; restore forward direction
+    MOV AL, 24H            ; '$'
+    STOSB
 
-; Point to destination
-LEA DI,REV
+    MOV AH, 09H
+    LEA DX, STR2
+    INT 21H
 
-L2:
-MOV AL,[SI]       ; Copy reverse character
-MOV [DI],AL
-
-DEC SI
-INC DI
-
-CMP SI,OFFSET SRC
-JAE L2
-
-; Add string terminator
-MOV AL,'$'
-MOV [DI],AL
-
-MOV AH,4CH
- Explain INT 21H
+    INT 3H
 
 CODE ENDS
 END START
